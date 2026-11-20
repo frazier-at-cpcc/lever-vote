@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pull the Lever: Screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#fbf3dc; --ink:#141414; --yellow:#ffd23f; --red:#e63946; --white:#fffdf6; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; }
+  body { margin:0; color:var(--ink); font:700 2.2vh/1.35 system-ui,-apple-system,"Segoe UI",sans-serif; display:flex; flex-direction:column;
+         background:var(--paper) radial-gradient(rgba(20,20,20,.12) .18vh, transparent .22vh) 0 0/1.3vh 1.3vh; }
+  .title { font-family:Bangers,Impact,"Arial Narrow",sans-serif; font-weight:400; letter-spacing:.04em; }
+  main { flex:1; padding:4vh 6vw 15vh; display:flex; flex-direction:column; justify-content:center; }
+  .caption { align-self:flex-start; background:var(--yellow); border:.45vh solid var(--ink); padding:.4vh 1.4vh; font-size:2.4vh; font-weight:800;
+             text-transform:uppercase; letter-spacing:.05em; margin:0 0 -.45vh 2vh; position:relative; z-index:1; }
+  .bubble { background:var(--white); border:.6vh solid var(--ink); border-radius:2.6vh; padding:2.2vh 3vh; box-shadow:.9vh .9vh 0 var(--ink); margin-bottom:3.5vh; }
+  h1 { margin:0; font-size:6.4vh; line-height:1.02; }
+  .row { display:grid; grid-template-columns:minmax(0,1fr) 8vw; align-items:center; gap:2vw; margin-bottom:1.6vh; font-size:2.7vh; }
+  .track { height:3vh; background:var(--white); border:.45vh solid var(--ink); box-shadow:.5vh .5vh 0 var(--ink); margin-top:.8vh; }
+  .fill { height:100%; transition:width .8s; border-right:.45vh solid var(--ink);
+          background-image:radial-gradient(rgba(255,255,255,.35) .2vh, transparent .25vh); background-size:1.1vh 1.1vh; }
+  .pct { text-align:right; font:400 5.4vh/1 Bangers,Impact,sans-serif; letter-spacing:.03em; }
+  .count { font:400 18vh/1 Bangers,Impact,sans-serif; color:var(--yellow); -webkit-text-stroke:.5vh var(--ink); text-shadow:1vh 1vh 0 var(--ink); }
+  .note { align-self:flex-start; background:var(--white); border:.45vh solid var(--ink); padding:.6vh 1.4vh; font-size:2.6vh; margin-top:2vh; }
+  footer { position:fixed; left:6vw; bottom:2.5vh; display:flex; align-items:center; gap:1.6vw; font-size:2.6vh; }
+  footer[hidden] { display:none; }
+  footer img { width:11vh; height:11vh; background:#fff; padding:.6vh; border:.45vh solid var(--ink); }
+  footer span { background:var(--white); border:.45vh solid var(--ink); padding:.6vh 1.4vh; box-shadow:.5vh .5vh 0 var(--ink); }
+  .stage { display:grid; grid-template-columns:minmax(0,1fr) 36vw; gap:3vw; align-items:start; }
+  .stage .text { display:flex; flex-direction:column; min-width:0; }
+  .panel { margin:6vh 0 0; border:.6vh solid var(--ink); box-shadow:1vh 1vh 0 var(--ink); line-height:0; transform:rotate(1deg); background:var(--ink); }
+  .panel img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
+  .lobby { display:flex; align-items:center; gap:5vw; }
+  .lobby img { width:36vh; height:36vh; background:#fff; padding:1.4vh; border:.7vh solid var(--ink); box-shadow:1.2vh 1.2vh 0 var(--ink); transform:rotate(-2deg); }
+  .lobby h1 { font-size:11vh; color:var(--yellow); -webkit-text-stroke:.45vh var(--ink); text-shadow:1vh 1vh 0 var(--ink); margin-bottom:3vh; }
+  .lobby p { display:inline-block; font-size:4vh; margin:0; background:var(--white); border:.5vh solid var(--ink); padding:1vh 2vh; box-shadow:.7vh .7vh 0 var(--ink); }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<footer id="foot"><img src="/qr.png" alt=""><span>Vote at <b id="host"></b></span></footer>
+<script>
+let build = null;
+function checkBuild(s) { if (s && s.build) { if (build && s.build !== build) location.reload(); build = s.build; } }
+const COLORS = ["#ff9f43", "#1d4ed8", "#2f9e44", "#7c3aed", "#e63946", "#0c8599"];
+const host = location.host;
+document.getElementById("host").textContent = host;
+const app = document.getElementById("app"), foot = document.getElementById("foot");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let last = "";
+
+function render(s) {
+  checkBuild(s);
+  const key = JSON.stringify(s);
+  if (key === last) return;
+  last = key;
+  foot.hidden = !s.poll;
+  if (!s.poll) {
+    app.innerHTML = `<div class="lobby"><img src="/qr.png" alt="QR code for ${esc(host)}"><div>
+      <h1 class="title">Would you pull the lever?</h1><p>Scan the code or go to <b>${esc(host)}</b></p></div></div>`;
+    return;
+  }
+  const p = s.poll;
+  let html = `<p class="caption">${esc(p.title)}</p><div class="bubble"><h1 class="title">${esc(p.question)}</h1></div>`;
+  if (s.results) {
+    const total = s.counts.reduce((a, b) => a + b, 0) || 1;
+    html += p.options.map((o, i) => {
+      const pct = Math.round(100 * s.counts[i] / total);
+      return `<div class="row"><div>${esc(o)}<div class="track"><div class="fill" style="width:${pct}%;background-color:${COLORS[i % 6]}"></div></div></div><div class="pct">${pct}%</div></div>`;
+    }).join("");
+    html += `<p class="note">${s.total} vote${s.total === 1 ? "" : "s"}</p>`;
+  } else {
+    html += `<div class="count">${s.total}</div><p class="note">${s.open ? "votes so far" : "votes. Voting closed."}</p>`;
+  }
+  app.innerHTML = p.image
+    ? `<div class="stage"><div class="text">${html}</div><figure class="panel"><img src="${esc(p.image)}" alt="${esc(p.alt || "")}"></figure></div>`
+    : html;
+}
+
+async function poll() {
+  try { render(await (await fetch("/api/state", {cache: "no-store"})).json()); } catch (e) {}
+}
+poll();
+setInterval(poll, 1500);
+</script>
+</body>
+</html>

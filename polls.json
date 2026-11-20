@@ -1,0 +1,132 @@
+[
+ {
+  "id": "p1",
+  "title": "Poll 1: The Original Trolley Problem",
+  "slide": 12,
+  "question": "Would you pull the lever?",
+  "options": [
+   "Intervene",
+   "Don't intervene"
+  ],
+  "image": "/art/p1.jpg",
+  "alt": "A red streetcar speeds toward five people on the tracks."
+ },
+ {
+  "id": "p2",
+  "title": "Poll 2: The Self-Driving Car",
+  "slide": 23,
+  "question": "What should the car do?",
+  "options": [
+   "Swerve left (elderly pedestrian)",
+   "Swerve right (child)",
+   "Continue straight (you die)",
+   "Randomize the choice"
+  ],
+  "image": "/art/p2.jpg",
+  "alt": "A self-driving car faces three paths: an elderly pedestrian, a barrier, and a child."
+ },
+ {
+  "id": "p3",
+  "title": "Poll 3: The AI Hiring Tool",
+  "slide": 38,
+  "question": "What do you do with the hiring AI?",
+  "options": [
+   "Shut it down: return to human hiring",
+   "Remove the biased factors: hope there aren't deeper patterns",
+   "Keep using it: it predicts performance, right?",
+   "Audit but keep running: 47,000 applications aren't going to read themselves"
+  ],
+  "image": "/art/p3.jpg",
+  "alt": "A robot hand pulls one resume from a mountain of applications."
+ },
+ {
+  "id": "p4",
+  "title": "Poll 4: The Deepfake",
+  "slide": 46,
+  "question": "What should the principal do?",
+  "options": [
+   "Expel him: his record follows him for life",
+   "Suspend and educate: the girls see him in class next week",
+   "Call the police: a fourteen-year-old faces criminal charges",
+   "Ban phones schoolwide: everyone pays for one student",
+   "Report the app: it returns tomorrow under a new name"
+  ],
+  "image": "/art/p4.jpg",
+  "alt": "Students in a school hallway; several girls stand apart while others whisper over phones."
+ },
+ {
+  "id": "p5",
+  "title": "Poll 5: The AI Agent",
+  "slide": 61,
+  "question": "Who should repay the $2,400?",
+  "options": [
+   "The model maker",
+   "The app developer",
+   "Your employer",
+   "You",
+   "Split it among everyone"
+  ],
+  "image": "/art/p5.jpg",
+  "alt": "Five contestants at podiums: model maker, app developer, your employer, the website, and you."
+ },
+ {
+  "id": "p6",
+  "title": "Poll 6: The AI Companion",
+  "slide": 71,
+  "question": "The app must respond within seconds. What should it do?",
+  "options": [
+   "Alert her parents: if home is the problem, this makes it worse",
+   "Request a wellness check: police at the door at midnight",
+   "Stay and share 988: keep her trust and hope it is enough",
+   "End the conversation: protect the company",
+   "Ban minors: age checks mean ID checks for everyone"
+  ],
+  "image": "/art/p6.jpg",
+  "alt": "A teenager on a school bus at dusk smiles at a chat on her phone."
+ },
+ {
+  "id": "p7",
+  "title": "Poll 7A: The AI Grading Dilemma",
+  "slide": 86,
+  "question": "What should universities do?",
+  "options": [
+   "Ban AI detection (accept some cheating)",
+   "Require AI disclosure (trust students)",
+   "Change assessment entirely (oral exams, portfolios)",
+   "Embrace AI as a tool",
+   "Human review of flags only"
+  ],
+  "image": "/art/p7.jpg",
+  "alt": "A trolley labeled AI detection policy heads toward actual cheaters on one track and falsely accused students on the other."
+ },
+ {
+  "id": "p8",
+  "title": "Poll 7B: The AI Grading Dilemma",
+  "slide": 86,
+  "question": "What would you do tonight?",
+  "options": [
+   "Write it myself, even if it is late",
+   "Use AI for an outline, then write it myself",
+   "Use AI and disclose it",
+   "Use AI and do not disclose it"
+  ],
+  "image": "/art/p8.jpg",
+  "alt": "A student types at a laptop at 2 AM, surrounded by coffee cups and notes."
+ },
+ {
+  "id": "p9",
+  "title": "Final Poll: The Meta-Trolley",
+  "slide": 93,
+  "question": "Where do you fit?",
+  "options": [
+   "Technical (building safer systems)",
+   "Legal/Policy (creating accountability)",
+   "Philosophy/Ethics (clarifying values)",
+   "Journalism/Activism (public awareness)",
+   "Business (market incentives for ethics)",
+   "I don't know yet, and that's fine"
+  ],
+  "image": "/art/p9.jpg",
+  "alt": "Six figures stand in a row: technologist, policy maker, philosopher, journalist, business leader, and an unknown future."
+ }
+]

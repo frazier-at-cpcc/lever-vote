@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pull the Lever: Vote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#fbf3dc; --ink:#141414; --yellow:#ffd23f; --red:#e63946; --blue:#1d4ed8; --white:#fffdf6; }
+  * { box-sizing:border-box; }
+  body { margin:0; color:var(--ink); font:600 17px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;
+         background:var(--paper) radial-gradient(rgba(20,20,20,.13) 1.2px, transparent 1.4px) 0 0/9px 9px; min-height:100vh; }
+  .title { font-family:Bangers,Impact,"Arial Narrow",sans-serif; font-weight:400; letter-spacing:.04em; }
+  header { margin:14px 16px 0; padding:10px 14px; background:var(--red); color:var(--yellow); border:4px solid var(--ink);
+           box-shadow:5px 5px 0 var(--ink); transform:rotate(-1deg); font-size:28px; line-height:1; text-align:center;
+           -webkit-text-stroke:1px var(--ink); text-shadow:2px 2px 0 var(--ink); }
+  main { max-width:560px; margin:0 auto; padding:22px 16px 40px; }
+  .caption { display:inline-block; margin-bottom:0; background:var(--yellow); border:3px solid var(--ink); padding:3px 10px; font-size:13px;
+             font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin:0 0 -3px 10px; position:relative; z-index:1; }
+  .bubble { background:var(--white); border:4px solid var(--ink); border-radius:18px; padding:18px 18px 16px; box-shadow:5px 5px 0 var(--ink);
+            position:relative; margin-bottom:26px; }
+  .bubble::after { content:""; position:absolute; left:34px; bottom:-22px; border:11px solid transparent; border-top:14px solid var(--ink); border-left-width:0; }
+  .bubble::before { content:""; position:absolute; left:38px; bottom:-13px; border:7px solid transparent; border-top:10px solid var(--white); border-left-width:0; z-index:1; }
+  h1 { margin:0; font-size:32px; line-height:1.05; }
+  .opts { display:grid; gap:12px; }
+  button.opt { width:100%; text-align:left; padding:15px 16px; min-height:58px; border:3px solid var(--ink); border-radius:4px; background:var(--white);
+               color:var(--ink); font-family:inherit; font-weight:700; font-size:17px; line-height:1.3; cursor:pointer; box-shadow:4px 4px 0 var(--ink); transition:transform .08s, box-shadow .08s; position:relative; }
+  button.opt:active { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--ink); }
+  button.opt:focus-visible { outline:4px solid var(--blue); outline-offset:3px; }
+  button.opt[aria-pressed="true"] { background:var(--yellow) radial-gradient(rgba(230,57,70,.28) 1.3px, transparent 1.5px) 0 0/7px 7px; }
+  button.opt[aria-pressed="true"]::after { content:"VOTED!"; position:absolute; right:-6px; top:-14px; background:var(--red); color:var(--white);
+               border:3px solid var(--ink); padding:1px 8px; font:400 16px/1.2 Bangers,Impact,sans-serif; letter-spacing:.05em; transform:rotate(6deg); }
+  button.opt:disabled { cursor:default; box-shadow:2px 2px 0 var(--ink); opacity:.8; }
+  .status { margin-top:18px; display:inline-block; background:var(--white); border:3px solid var(--ink); padding:6px 10px; font-size:15px; }
+  .bar { margin:0 0 14px; }
+  .bar .lbl { display:flex; justify-content:space-between; gap:12px; font-weight:800; }
+  .bar .track { height:22px; background:var(--white); border:3px solid var(--ink); margin-top:5px; box-shadow:3px 3px 0 var(--ink); }
+  .bar .fill { height:100%; background:var(--blue) radial-gradient(rgba(255,255,255,.35) 1.3px, transparent 1.5px) 0 0/7px 7px; transition:width .6s; border-right:3px solid var(--ink); }
+  .bar.mine .fill { background-color:var(--red); }
+  .bar.mine .lbl span:first-child::after { content:" (you)"; color:var(--red); }
+  .panel { margin:0 0 16px; border:4px solid var(--ink); box-shadow:5px 5px 0 var(--ink); background:var(--ink); line-height:0; }
+  .panel img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
+  .lobby { text-align:center; padding-top:12vh; }
+  .lobby strong { display:inline-block; font:400 52px/1 Bangers,Impact,sans-serif; letter-spacing:.04em; color:var(--yellow);
+                  -webkit-text-stroke:2px var(--ink); text-shadow:4px 4px 0 var(--ink); transform:rotate(-3deg); margin-bottom:18px; }
+  .lobby span { display:block; max-width:320px; margin:0 auto; background:var(--white); border:3px solid var(--ink); padding:10px 12px; box-shadow:4px 4px 0 var(--ink); }
+</style>
+</head>
+<body>
+<header class="title">Would you pull the lever?</header>
+<main id="app" aria-live="polite"><p class="lobby"><strong>Loading...</strong></p></main>
+<script>
+let build = null;
+function checkBuild(s) { if (s && s.build) { if (build && s.build !== build) location.reload(); build = s.build; } }
+const app = document.getElementById("app");
+let last = "", busy = false;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(s) {
+  checkBuild(s);
+  const key = JSON.stringify(s);
+  if (key === last) return;
+  last = key;
+  if (!s.poll) {
+    app.innerHTML = '<p class="lobby"><strong>Stand by!</strong><span>The next question appears here when the presenter opens it.</span></p>';
+    return;
+  }
+  const p = s.poll;
+  let html = `<p class="caption">${esc(p.title)}</p>`
+    + (p.image ? `<figure class="panel"><img src="${esc(p.image)}" alt="${esc(p.alt || "")}"></figure>` : "")
+    + `<div class="bubble"><h1 class="title">${esc(p.question)}</h1></div>`;
+  if (s.results) {
+    const total = s.counts.reduce((a, b) => a + b, 0) || 1;
+    html += p.options.map((o, i) => {
+      const pct = Math.round(100 * s.counts[i] / total);
+      return `<div class="bar${s.my_vote === i ? " mine" : ""}"><div class="lbl"><span>${esc(o)}</span><span>${pct}%</span></div>
+              <div class="track"><div class="fill" style="width:${pct}%"></div></div></div>`;
+    }).join("");
+    html += `<p class="status">${s.total} vote${s.total === 1 ? "" : "s"}.</p>`;
+  } else {
+    html += '<div class="opts">' + p.options.map((o, i) =>
+      `<button class="opt" data-i="${i}" aria-pressed="${s.my_vote === i}" ${s.open ? "" : "disabled"}>${esc(o)}</button>`).join("") + "</div>";
+    html += `<p class="status">${!s.open ? "Voting is closed." : s.my_vote == null ? "Tap an answer." : "Vote recorded. You can change it until voting closes."}</p>`;
+  }
+  app.innerHTML = html;
+}
+
+async function poll() {
+  try { render(await (await fetch("/api/state", {cache: "no-store"})).json()); } catch (e) {}
+}
+
+app.addEventListener("click", async e => {
+  const b = e.target.closest("button.opt");
+  if (!b || busy) return;
+  busy = true;
+  app.querySelectorAll("button.opt").forEach(x => x.setAttribute("aria-pressed", x === b));
+  try {
+    const r = await fetch("/api/vote", {method: "POST", headers: {"Content-Type": "application/json"},
+                                        body: JSON.stringify({option: +b.dataset.i})});
+    if (!r.ok) app.querySelector(".status").textContent = "Voting is closed.";
+  } finally { busy = false; last = ""; poll(); }
+});
+
+poll();
+setInterval(poll, 2000);
+</script>
+</body>
+</html>

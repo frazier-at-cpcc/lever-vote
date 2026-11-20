@@ -1,0 +1,5 @@
+state.json
+.admin-key
+__pycache__/
+.tunnel-id
+static/qr.png
